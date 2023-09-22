@@ -1,0 +1,10 @@
+<launch>
+
+<!-- <arg name="file_dir" default="" />
+<arg name="out_bag_name"  default="" /> -->
+
+<node pkg="data_parse" type="data_parse" name="data_parse" args=" -file_dir $(arg file_dir)
+       -out_bag_name $(arg out_bag_name)"  output="screen">
+</node>
+</launch>
+
