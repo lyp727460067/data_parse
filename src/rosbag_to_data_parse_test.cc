@@ -76,11 +76,11 @@ bool WriteOutPutImage(std::string outdir, const rosbag::MessageInstance& msg) {
 bool WriteOutPutImu(std::fstream& file, const rosbag::MessageInstance& msg) {
   if (msg.isType<sensor_msgs::Imu>()) {
     auto imu_msg = msg.instantiate<sensor_msgs::Imu>();
-    file << imu_msg->header.stamp.toNSec() << " " << imu_msg->angular_velocity.x
-         << " " << imu_msg->angular_velocity.y << " "
-         << imu_msg->angular_velocity.z << " " << imu_msg->linear_acceleration.x
+    file << imu_msg->header.stamp.toNSec() << " " << imu_msg->linear_acceleration.x
          << " " << imu_msg->linear_acceleration.y << " "
-         << imu_msg->linear_acceleration.z << "0.0"
+         << imu_msg->linear_acceleration.z << " " << imu_msg->angular_velocity.x
+         << " " << imu_msg->angular_velocity.y << " "
+         << imu_msg->angular_velocity.z << "0.0"
          << " "
          << "0.0"
          << " "

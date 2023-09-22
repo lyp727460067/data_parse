@@ -174,12 +174,8 @@ sensor_msgs::CompressedImage::Ptr ToRosCompressedImage(const ImageData& image) {
   //
   sensor_msgs::CompressedImage::Ptr image_up(
       new sensor_msgs::CompressedImage());
-  image_up->format = "bgr8";
+  image_up->format = "mono8";
   image_up->format += "; jpeg compressed ";
-  image_up->format += "bgr8";
-  boost::shared_ptr<compressed_image_transport::CompressedPublisher>
-      tracked_object;
-  std::string targetFormat = "bgr8";
   //
   std_msgs::Header header;
   header.frame_id = "camera";
@@ -188,6 +184,8 @@ sensor_msgs::CompressedImage::Ptr ToRosCompressedImage(const ImageData& image) {
   header.stamp = t;
   std::vector<uint8_t> encodeing;
   cv::imencode(".jpg", image.images, image_up->data);
+  // cv::imshow("11", image.images);
+  // cv::waitKey(0);
   image_up->header = header;
   return image_up;
 }
@@ -216,17 +214,17 @@ void Run(rosbag::Bag& out_bag, std::map<uint64_t, ImuData>& imu_datas,
   WriteImuData(out_bag, images_datas.begin()->first, imu_datas);
   for (const auto& image : images_datas) {
     //
-    WriteImuData(out_bag, image.second.time, imu_datas);    
-    const auto image_data = ToRosCompressedImage(image.second);
-    out_bag.write(kImagTopic0, image_data->header.stamp, image_data);
-    out_bag.write(kImagTopic1, image_data->header.stamp, image_data);
     LOG(INFO) << "image time : " << image.second.time
               << " start imu t: " << imu_datas.begin()->first
               << ", end imu t: " << imu_datas.upper_bound(image.first)->first
               << " size:"
               << std::distance(imu_datas.begin(),
-                               imu_datas.upper_bound(image.first));
+                               imu_datas.upper_bound(image.first));    
+    WriteImuData(out_bag, image.second.time, imu_datas);
 
+    const auto image_data = ToRosCompressedImage(image.second);
+    out_bag.write(kImagTopic0, image_data->header.stamp, image_data);
+    out_bag.write(kImagTopic1, image_data->header.stamp, image_data);
   }
   if (!imu_datas.empty()) {
     WriteImuData(out_bag, UINT64_MAX, imu_datas);

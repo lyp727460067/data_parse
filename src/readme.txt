@@ -2,7 +2,7 @@
 build ---
 cd /home/user/
 mkdir -p catkin_ws/src  && cd  catkin_ws/src
-git clone 
+git clone  http://192.168.1.132:8080/spatialnavigation/metaboundsviogroup/data_parse
 cd ..
 catkin_make -DCATKIN_WHITELIST_PACKAGES="data_parse"
 
