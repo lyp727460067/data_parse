@@ -219,7 +219,8 @@ void Run(rosbag::Bag& out_bag, std::map<uint64_t, ImuData>& imu_datas,
               << ", end imu t: " << imu_datas.upper_bound(image.first)->first
               << " size:"
               << std::distance(imu_datas.begin(),
-                               imu_datas.upper_bound(image.first));    
+                               imu_datas.upper_bound(image.first));  
+
     WriteImuData(out_bag, image.second.time, imu_datas);
 
     const auto image_data = ToRosCompressedImage(image.second);
