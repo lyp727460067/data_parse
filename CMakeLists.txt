@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project(data_parse)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++17)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
@@ -152,6 +152,7 @@ include_directories(
 # # The recommended prefix ensures that target names across packages don't collide
 #
 add_executable(${PROJECT_NAME} src/data_parse.cc)
+add_executable(${PROJECT_NAME}_pic src/data_parse_pic.cc)
 add_executable(${PROJECT_NAME}_data_from_bag_test src/rosbag_to_data_parse_test.cc)
 #
 # # Rename C++ executable without prefix
@@ -167,6 +168,7 @@ add_executable(${PROJECT_NAME}_data_from_bag_test src/rosbag_to_data_parse_test.
 # # Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}     boost_thread ${catkin_LIBRARIES} ${GLOG_LIBRARIES} ${GFLAGS_LIBRARIES})
 target_link_libraries(${PROJECT_NAME}_data_from_bag_test     boost_thread ${catkin_LIBRARIES} ${GLOG_LIBRARIES} ${GFLAGS_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_pic   boost_thread ${catkin_LIBRARIES} ${GLOG_LIBRARIES} ${GFLAGS_LIBRARIES})
 #############
 ## Install ##
 #############

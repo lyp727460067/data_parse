@@ -67,20 +67,10 @@ struct ImuData {
 std::optional<std::pair<uint64_t, uint64_t>> init_imu_time;
 
 std::istringstream& operator>>(std::istringstream& ifs, ImuData& imu_data) {
-  double time;
+  uint64_t time;
   ifs >> time;
   char unuse_char;
   ifs >> unuse_char;
-  uint64_t unuse_time;
-  ifs >> unuse_time >> unuse_char;
-
-  // LOG(INFO)<<std::to_string(time);
-  if (!init_imu_time.has_value()) {
-    init_imu_time =
-        std::pair<uint64_t, uint64_t>(static_cast<uint64_t>(time), unuse_time);
-  }
-  uint64_t delta_imu_t = time - init_imu_time->first;
-  // imu_data.time = init_imu_time->second + delta_imu_t;
   imu_data.time = static_cast<uint64_t>(time);
   LOG(INFO) << "Imu time: " << imu_data.time;
   static uint64_t init_imu_data_time = 0;
@@ -98,11 +88,9 @@ std::istringstream& operator>>(std::istringstream& ifs, ImuData& imu_data) {
       imu_data.linear_acceleration.z() >> unuse_char >>
       imu_data.angular_velocity.x() >> unuse_char >>
       imu_data.angular_velocity.y() >> unuse_char >>
-      imu_data.angular_velocity.z() >> unuse_char;
+      imu_data.angular_velocity.z() ;
 
-  Eigen::Vector3d unuse_mag_data;
-  ifs >> unuse_mag_data.x() >> unuse_char >> unuse_mag_data.y() >> unuse_char >>
-      unuse_mag_data.z();
+ 
   return ifs;
 }
 //
@@ -168,7 +156,7 @@ uint64_t GetTimeFromName(const std::string& name) {
   auto it = name.find_last_of('/');
   std::string outdir = name.substr(0, it + 1);
   const std::string file_name =
-      name.substr(it + 15, name.size() - outdir.size());
+      name.substr(it + 1, name.size() - outdir.size());
   auto it1 = file_name.find_last_of('.');
   LOG(INFO)<<std::stol(file_name.substr(0, it1));
   return std::stol(file_name.substr(0, it1));
@@ -224,7 +212,7 @@ struct ImageData {
              !result
                  .emplace(GetTimeFromName(file),
                           ImageData{GetTimeFromName(file),
-                                    YuvToMat(file)})
+                                    cv::imread(file,cv::IMREAD_GRAYSCALE)})
                  .second)
           << "Image time duplicate..";
     }
@@ -326,9 +314,9 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
   LOG(INFO) << "Parse image dir: " << FLAGS_file_dir + "/" + kImagDataDirName+"/";
-  LOG(INFO) << "Parse imu dir: " << FLAGS_file_dir + "/"+"imu.csv";
+  LOG(INFO) << "Parse imu dir: " << FLAGS_file_dir + "/"+"imu.txt";
   auto image_datas = ImageData::Parse(FLAGS_file_dir + "/" + kImagDataDirName+"/");
-  auto imu_datas = ImuData::Parse(FLAGS_file_dir + "/"+"imu.csv");
+  auto imu_datas = ImuData::Parse(FLAGS_file_dir + "/"+"imu.txt");
   LOG(INFO) << "Start write sensor data to " << FLAGS_out_bag_name;
   Run(out_bag, imu_datas, image_datas);
   LOG(INFO)<<"Write done..";
